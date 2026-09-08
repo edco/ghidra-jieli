@@ -440,6 +440,17 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 }
 
 #
+# rA = b[rB-imm16] (u)
+# => lb.z rA, [rB - imm16]
+#
+:lb.z eregA, [eregB - imm16] is group=7 & ins0011=0xe51 ; eregA & eregB & imm1619 & imm2427
+[ imm16 = (imm2427 << 8) | imm1619; ]
+{
+	local addr:4 = eregB - imm16;
+	eregA = zext(*:1 addr);
+}
+
+#
 # rA = b[rB+rC] (u)
 # => lb.z rA, [rB + rC]
 #
