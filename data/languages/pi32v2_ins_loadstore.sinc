@@ -429,25 +429,26 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 }
 
 #
-# rA = b[rB+imm16] (u)
-# => lb.z rA, [rB + imm16]
+# rA = b[rB+imm8] (u)
+# => lb.z rA, [rB + imm8]
 #
-:lb.z eregA, [eregB + imm16] is group=7 & ins0011=0xe50 ; eregA & eregB & imm1619 & imm2427
-[ imm16 = (imm2427 << 8) | imm1619; ]
+:lb.z eregA, [eregB + imm8] is group=7 & ins0011=0xe50 ; eregA & eregB & imm1619 & imm2427
+[ imm8 = (imm2427 << 4) | imm1619; ]
 {
-	local addr:4 = eregB + imm16;
+	local addr:4 = eregB + imm8;
 	eregA = zext(*:1 addr);
 }
 
 #
-# rA = b[rB-imm16] (u)
-# => lb.z rA, [rB - imm16]
+# rA = b[rB+imm8] (s)
+# => lb.s rA, [rB + imm8]
 #
-:lb.z eregA, [eregB - imm16] is group=7 & ins0011=0xe51 ; eregA & eregB & imm1619 & imm2427
-[ imm16 = (imm2427 << 8) | imm1619; ]
+:lb.s eregA, [eregB + imm8] is group=7 & ins0011=0xe51 ; eregA & eregB & imm1619 & imm2427
+[ imm8 = (imm2427 << 4) | imm1619; ]
 {
-	local addr:4 = eregB - imm16;
-	eregA = zext(*:1 addr);
+	local offset:4 = ((imm8 << 24) s>> 24);
+	local addr:4 = eregB + offset;
+	eregA = sext(*:1 addr);
 }
 
 #
