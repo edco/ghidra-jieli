@@ -47,6 +47,17 @@
 }
 
 #
+# sp += imm13s
+# => add sp, #imm13s
+#
+:add "sp", #imm13s is group=7 & ins0012=0x08f0 ; imm1617=0 & imm2931=0 & imm1828s
+[ imm13s = imm1828s << 2; ]
+{
+	sp = sp + imm13s;
+}
+
+
+#
 # rA = rB + imm5
 # => add rA, rB, #imm5
 #
