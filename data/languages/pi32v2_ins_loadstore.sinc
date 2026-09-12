@@ -440,15 +440,14 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 }
 
 #
-# rA = b[rB+imm8] (s)
-# => lb.s rA, [rB + imm8]
+# rA = b[rB+imm8] (u) (negative offset)
+# => lb.z rA, [rB + imm8]
 #
-:lb.s eregA, [eregB + imm8] is group=7 & ins0011=0xe51 ; eregA & eregB & imm1619 & imm2427
-[ imm8 = (imm2427 << 4) | imm1619; ]
+:lb.z eregA, [eregB + imm8] is group=7 & ins0011=0xe51 ; eregA & eregB & imm1619 & imm2427
+[ imm8 = -((((1<<8) | (imm2427 << 4) | imm1619)^0x1ff) + 1); ]
 {
-	local offset:4 = ((imm8 << 24) s>> 24);
-	local addr:4 = eregB + offset;
-	eregA = sext(*:1 addr);
+	local addr:4 = eregB + imm8;
+	eregA = zext(*:1 addr);
 }
 
 #
