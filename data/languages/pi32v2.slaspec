@@ -440,7 +440,6 @@ parainst:^instruction is parallel_phase=0 & prefix=6 & instruction
     group=0; globalset(inst_next, group);
 ]
 {
-    delayslot(1);
     build instruction;
 }
 
@@ -454,7 +453,6 @@ parainst:^instruction is parallel_phase=0 & prefix=7 & ins1112=0b10 & instructio
     group=7; globalset(inst_next, group);
 ]
 {
-    delayslot(1);
     build instruction;
 }
 
@@ -569,12 +567,18 @@ cdtinst:^elseinst is thenbranch=0 & elsebranch=1 & elseinst & closebracket=0
 :^cdtinst is phase=0 & ifblock=1 & cdtinst [phase=1;]{}
 
 # Default case, we are not processing a conditional instruction.
-:^parainst is parainst & phase=0 & ifblock=0 & closebracket=0 [phase=1;]{}
+:^parainst is parainst & phase=0 & ifblock=0 & closebracket=0 [phase=1;]
+{
+    build parainst;
+}
 
 # Special case, we need to add a final bracket to an if block
 # but this instruction does not belong to the if..then..else structure.
 :^"} " parainst is parainst & phase=0 & ifblock=0 & closebracket=1
-[ phase=1; closebracket=0; globalset(inst_next, closebracket); ]{}
+[ phase=1; closebracket=0; globalset(inst_next, closebracket); ]
+{
+    build parainst;
+}
 
 
 #############################################################################
