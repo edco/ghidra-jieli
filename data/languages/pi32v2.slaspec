@@ -186,6 +186,7 @@ define token instr2(16)
     imm1630 = (0,14)
 	imm1631 = (0,15)
     imm1631s = (0,15) signed
+    imm1717 = (1,1)
     imm1719 = (1,3)
     imm1727 = (1,11)
     imm1827 = (2,11)
@@ -667,9 +668,10 @@ define pcodeop TODO;
 }
 
 #
+#
 # ssync
 #
-:ssync is group=0 & ins0012=0x0022
+:ssync is group=0 & ins0512=1 & ins0003=2
 {
 	SystemSynchronize();
 }
@@ -696,6 +698,13 @@ define pcodeop TODO;
 :lockset is group=0 & ins0012=0x0041
 {
 	SetLock();
+}
+
+#
+# sevl
+#
+:sevl is group=0 & ins0012=0x0042
+{
 }
 
 #

@@ -43,6 +43,14 @@
 }
 
 #
+# rthw
+#
+:rthw is group=0 & ins0012=0x0086
+{
+	return [rets];
+}
+
+#
 # trigger
 #
 :trigger is group=7 & ins0012=0x0870 ; imm1631=0
@@ -312,6 +320,24 @@
 {
     if ((eregA s> regA) || (eregA == regA))
         goto jaddr9e;
+}
+
+#
+# ifeq goto reladdr16
+#
+:ifeq jaddr16 is group=7 & ins0012=0x0840 ; jaddr16
+{
+    if (cres == 0)
+        goto jaddr16;
+}
+
+#
+# ifne goto reladdr16
+#
+:ifne jaddr16 is group=7 & ins0012=0x08c0 ; jaddr16
+{
+    if (cres != 0)
+        goto jaddr16;
 }
 
 ##

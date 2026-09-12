@@ -335,9 +335,25 @@
     eregA = eregB s/ eregC;
 }
 
+#
+# rB_rA = rD_rC / rE (unsigned)
+#
+:div edregA, edregB, eregC is group=7 & ins0011=0x1f6 ; edregA & edregB & eregC & imm1619=0 & imm2828=0
+{
+    edregA = edregB / zext(eregC);
+}
+
+#
+# rB_rA = rD_rC / rE (signed)
+#
+:div.s edregA, edregB, eregC is group=7 & ins0011=0x1f6 ; edregA & edregB & eregC & imm1619=0 & imm2828=1
+{
+    edregA = edregB s/ sext(eregC);
+}
+
 
 ###########################################################################################
-# Absolute value
+# Absolute value / Saturation
 ###########################################################################################
 
 #
@@ -352,7 +368,34 @@
     eregA = eregC;
 }
 
-###########################################################################################
+#
+# rA = sat16(rB) (u)
+#
+:sat16.u eregA, eregC is group=7 & ins0011=0x078 ; eregA & eregC & imm1623=0
+{
+    if (eregC > 0xffff) goto <clamp>;
+    eregA = eregC;
+    goto inst_next;
+<clamp>
+    eregA = 0xffff;
+}
+
+#
+# rA = sat16(rB) (s)
+#
+:sat16.s eregA, eregC is group=7 & ins0011=0x078 ; eregA & eregC & imm1623=1
+{
+    if (eregC s> 0x7fff) goto <clamp_hi>;
+    if (eregC s< -0x8000) goto <clamp_lo>;
+    eregA = eregC;
+    goto inst_next;
+<clamp_hi>
+    eregA = 0x7fff;
+    goto inst_next;
+<clamp_lo>
+    eregA = -0x8000;
+}
+
 # Min / Max value
 ###########################################################################################
 

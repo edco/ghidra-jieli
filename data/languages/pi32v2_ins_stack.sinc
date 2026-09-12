@@ -129,6 +129,11 @@ popmapsregs16: popmapsregs16^popmsreg^msep is counter<3 & msregread & msep & pop
 popmapsregs16: popmsreg is counter=3 & msregread & popmsreg {}
 popsrmap16: popmapsregs16 is popmapsregs16 [bitset=0; counter=0; sep=0;]{}
 
+pshmapsregs16: pshmapsregs16^pshmsreg^msep is counter<3 & msregread & msep & pshmsreg & next & pshmapsregs16
+    { build pshmapsregs16; build pshmsreg; }
+pshmapsregs16: pshmsreg is counter=3 & msregread & pshmsreg {}
+pshsrmap16: pshmapsregs16 is pshmapsregs16 [bitset=0; counter=0; sep=0;]{}
+
 #######################################
 # Registers boundary to register list
 #######################################
@@ -293,6 +298,41 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 {
     mult_addr = sp;
     build popsrmap16;
+    sp = mult_addr;
+}
+
+#
+# [--sp] = {sregs...}
+# => push {sregs...}
+#
+:push {pshsrmap16} is group=0 & ins0412=0x04c ... & pshsrmap16
+{
+    mult_addr = sp;
+    build pshsrmap16;
+    sp = mult_addr;
+}
+
+#
+# {psr, sregs...} = [sp++]
+# => pop {psr, sregs...}
+#
+:pop {psr, popsrmap16} is group=0 & ins0412=0x04a ... & psr & popsrmap16
+{
+    mult_addr = sp;
+    popreg(psr);
+    build popsrmap16;
+    sp = mult_addr;
+}
+
+#
+# [--sp] = {psr, sregs...}
+# => push {psr, sregs...}
+#
+:push {psr, pshsrmap16} is group=0 & ins0412=0x04e ... & psr & pshsrmap16
+{
+    mult_addr = sp;
+    build pshsrmap16;
+    pushreg(psr);
     sp = mult_addr;
 }
 
@@ -539,6 +579,22 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 {
     local addr:4 = sp + imm12;
     eregA = zext(*:2 addr);
+}
+
+#
+# rA = h[sp+imm12] (s)
+# => lh.s rA, [sp+imm12]
+#
+:lh.s eregA, ["sp"] is group=7 & ins0011=0x9d9 ; eregA & imm1616=0 & imm1727=0
+{
+    eregA = sext(*:2 sp);
+}
+
+:lh.s eregA, ["sp"+imm12] is group=7 & ins0011=0x9d9 ; eregA & imm1616=0 & imm1727
+[ imm12 = (imm1727 << 1); ]
+{
+    local addr:4 = sp + imm12;
+    eregA = sext(*:2 addr);
 }
 
 #

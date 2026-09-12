@@ -93,21 +93,30 @@
 }
 
 #
+# rA_rB <<= #imm6
+#
+:lsl edregA, #imm6 is group=7 & ins0011=0x1d0 ; edregA & imm2627=0 & eregB=0 & imm1619 & imm2425
+[ imm6 = (imm2425 << 4) | imm1619; ]
+{
+    edregA = edregA << imm6;
+}
+
+#
 # rA_rB >>= #imm6
 #
-:lsr edregA, #imm6 is group=7 & ins0011=0x1d0 ; edregA & imm2627=0 & eregB=0 & imm1619 & imm2425
+:lsr edregA, #imm6 is group=7 & ins0011=0x1d0 ; edregA & imm2627=2 & eregB=0 & imm1619 & imm2425
 [ imm6 = (imm2425 << 4) | imm1619; ]
 {
     edregA = edregA >> imm6;
 }
 
 #
-# rA_rB <<= #imm6
+# rA_rB >>>= #imm6
 #
-:lsl edregA, #imm6 is group=7 & ins0011=0x1d0 ; edregA & imm2627=2 & eregB=0 & imm1619 & imm2425
+:qasr edregA, #imm6 is group=7 & ins0011=0x1d0 ; edregA & imm2627=3 & eregB=0 & imm1619 & imm2425
 [ imm6 = (imm2425 << 4) | imm1619; ]
 {
-    edregA = edregA << imm6;
+    edregA = edregA s>> imm6;
 }
 
 ###########################################################################################
@@ -176,11 +185,36 @@
 #
 # rA = rB >>> imm6
 # => qasr rA, rB, imm6
-:qasl eregA, eregB, imm6 is group=7 & ins0011=0x1c0 ; eregA & eregB & imm2627=3 & imm2425 & imm1619
+:qasr eregA, eregB, imm6 is group=7 & ins0011=0x1c0 ; eregA & eregB & imm2627=3 & imm2425 & imm1619
 [imm6 = (imm2425 << 4) | imm1619;]
 {
     eregA = eregB s>> imm6;
 }
+
+#
+# rA_rB <<= rC
+#
+:lsl edregA, eregC is group=7 & ins0011=0x1d8 ; edregA & eregB=0 & eregC & imm1619=0
+{
+    edregA = edregA << eregC;
+}
+
+#
+# rA_rB >>= rC
+#
+:lsr edregA, eregC is group=7 & ins0011=0x1d8 ; edregA & eregB=0 & eregC & imm1619=2
+{
+    edregA = edregA >> eregC;
+}
+
+#
+# rA_rB >>>= rC
+#
+:qasr edregA, eregC is group=7 & ins0011=0x1d8 ; edregA & eregB=0 & eregC & imm1619=3
+{
+    edregA = edregA s>> eregC;
+}
+
 
 
 ###########################################################################################
