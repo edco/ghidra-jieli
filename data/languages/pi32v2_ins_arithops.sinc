@@ -353,8 +353,32 @@
 }
 
 ###########################################################################################
-# Min value
+# Min / Max value
 ###########################################################################################
+
+#
+# rA = umax(rB, rC) (unsigned)
+#
+:umax eregA, eregB, eregC is group=7 & ins0011=0x434 ; eregA & eregB & eregC & imm1619=0
+{
+    if (eregB >= eregC) goto <skip>;
+    eregA = eregC;
+    goto inst_next;
+<skip>
+    eregA = eregB;
+}
+
+#
+# rA = smax(rB, rC) (signed)
+#
+:smax eregA, eregB, eregC is group=7 & ins0011=0x434 ; eregA & eregB & eregC & imm1619=1
+{
+    if (eregB s>= eregC) goto <skip>;
+    eregA = eregC;
+    goto inst_next;
+<skip>
+    eregA = eregB;
+}
 
 #
 # rA = umin(rB, rC) (unsigned)

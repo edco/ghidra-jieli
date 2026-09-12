@@ -150,6 +150,7 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 #
 
 
+
 ###########################################################################################
 # Load Word
 ###########################################################################################
@@ -211,6 +212,42 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 {
     eregA = *:4 eregB;
     eregB = eregB + imm8;
+}
+
+#
+# rA = [rB++=rC]
+#
+:lw eregA, [eregB++=eregC] is group=7 & ins0011=0xcde ; eregA & eregB & eregC & imm1619=2
+{
+    eregA = *:4 eregB;
+    eregB = eregB + eregC;
+}
+
+#
+# [rB++=rC] = rA
+#
+:sw eregA, [eregB++=eregC] is group=7 & ins0011=0xcde ; eregA & eregB & eregC & imm1619=3
+{
+    *:4 eregB = eregA;
+    eregB = eregB + eregC;
+}
+
+#
+# rA = [++rB=rC]
+#
+:lw eregA, [++eregB=eregC] is group=7 & ins0011=0xcdc ; eregA & eregB & eregC & imm1619=2
+{
+    eregB = eregB + eregC;
+    eregA = *:4 eregB;
+}
+
+#
+# [++rB=rC] = rA
+#
+:sw eregA, [++eregB=eregC] is group=7 & ins0011=0xcdc ; eregA & eregB & eregC & imm1619=3
+{
+    eregB = eregB + eregC;
+    *:4 eregB = eregA;
 }
 
 ###########################################################################################
@@ -336,6 +373,60 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 }
 
 
+#
+# rA = h[rB++=rC] (u)
+#
+:lh.z eregA, [eregB++=eregC] is group=7 & ins0011=0xdde ; eregA & eregB & eregC & imm1619=0
+{
+    eregA = zext(*:2 eregB);
+    eregB = eregB + eregC;
+}
+
+#
+# rA = h[rB++=rC] (s)
+#
+:lh.s eregA, [eregB++=eregC] is group=7 & ins0011=0xdde ; eregA & eregB & eregC & imm1619=2
+{
+    eregA = sext(*:2 eregB);
+    eregB = eregB + eregC;
+}
+
+#
+# h[rB++=rC] = rA
+#
+:sh eregA, [eregB++=eregC] is group=7 & ins0011=0xdde ; eregA & eregB & eregC & imm1619=1
+{
+    *:2 eregB = eregA:2;
+    eregB = eregB + eregC;
+}
+
+#
+# rA = h[++rB=rC] (u)
+#
+:lh.z eregA, [++eregB=eregC] is group=7 & ins0011=0xddc ; eregA & eregB & eregC & imm1619=0
+{
+    eregB = eregB + eregC;
+    eregA = zext(*:2 eregB);
+}
+
+#
+# rA = h[++rB=rC] (s)
+#
+:lh.s eregA, [++eregB=eregC] is group=7 & ins0011=0xddc ; eregA & eregB & eregC & imm1619=2
+{
+    eregB = eregB + eregC;
+    eregA = sext(*:2 eregB);
+}
+
+#
+# h[++rB=rC] = rA
+#
+:sh eregA, [++eregB=eregC] is group=7 & ins0011=0xddc ; eregA & eregB & eregC & imm1619=1
+{
+    eregB = eregB + eregC;
+    *:2 eregB = eregA:2;
+}
+
 ###########################################################################################
 # Load Byte (sign-extend)
 ###########################################################################################
@@ -419,6 +510,28 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 }
 
 #
+# b[++rB=imm8] = rA
+# => sb rA, [++rB=imm8] (positive number)
+#
+:sb eregA, [++eregB=#imm8] is group=7 & ins0011=0xe5a ; eregA & eregB & imm1619 & imm2427
+[ imm8 = (imm2427 << 4) | imm1619; ]
+{
+    eregB = eregB + imm8;
+    *:1 eregB = eregA:1;
+}
+
+#
+# b[++rB=imm8] = rA
+# => sb rA, [++rB=-imm8] (negative number)
+#
+:sb eregA, [++eregB=#imm8] is group=7 & ins0011=0xe5b ; eregA & eregB & imm1619 & imm2427
+[ imm8 = -((((1<<8) | (imm2427 << 4) | imm1619)^0x1ff) + 1); ]
+{
+    eregB = eregB + imm8;
+    *:1 eregB = eregA:1;
+}
+
+#
 # rA = b[rB+simm5] (u)
 # => lb.z rA, [rB + simm5]
 #
@@ -468,6 +581,51 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 {
     eregB = eregB + eregC;
     eregA = zext(*:1 eregB);
+}
+
+#
+# rA = b[++rB=rC] (s)
+#
+:lb.s eregA, [++eregB=eregC] is group=7 & ins0011=0xedc ; eregA & eregB & eregC & imm1619=2
+{
+    eregB = eregB + eregC;
+    eregA = sext(*:1 eregB);
+}
+
+#
+# b[++rB=rC] = rA
+#
+:sb eregA, [++eregB=eregC] is group=7 & ins0011=0xedc ; eregA & eregB & eregC & imm1619=1
+{
+    eregB = eregB + eregC;
+    *:1 eregB = eregA:1;
+}
+
+#
+# rA = b[rB++=rC] (u)
+#
+:lb.z eregA, [eregB++=eregC] is group=7 & ins0011=0xede ; eregA & eregB & eregC & imm1619=0
+{
+    eregA = zext(*:1 eregB);
+    eregB = eregB + eregC;
+}
+
+#
+# rA = b[rB++=rC] (s)
+#
+:lb.s eregA, [eregB++=eregC] is group=7 & ins0011=0xede ; eregA & eregB & eregC & imm1619=2
+{
+    eregA = sext(*:1 eregB);
+    eregB = eregB + eregC;
+}
+
+#
+# b[rB++=rC] = rA
+#
+:sb eregA, [eregB++=eregC] is group=7 & ins0011=0xede ; eregA & eregB & eregC & imm1619=1
+{
+    *:1 eregB = eregA:1;
+    eregB = eregB + eregC;
 }
 
 ###########################################################################################
@@ -757,14 +915,4 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 {
     *:1 eregB = eregA:1;
     eregB = eregB + imm8;
-}
-
-#
-# b[++rA=rB] = rC
-# => sb rC, [++rA = rB]
-#
-:sb eregC, [++eregB = eregA] is group=7 & ins0011=0xedc ; eregA & eregB & eregC & imm1619=1
-{
-    eregB = eregB + eregA;
-    *:1 eregB = eregC:1;
 }

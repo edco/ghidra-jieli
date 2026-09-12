@@ -57,6 +57,32 @@ popmapsreg: sr4 is counter=4 & sr4 {popreg(sr4);}
 popmapsreg: psr is counter=5 & psr {popreg(psr);}
 popmapsreg: cnum is counter=6 & cnum {popreg(cnum);}
 popmapsreg: sr7 is counter=7 & sr7 {popreg(sr7);}
+popmapsreg: sr8 is counter=8 & sr8 {popreg(sr8);}
+popmapsreg: sr9 is counter=9 & sr9 {popreg(sr9);}
+popmapsreg: sr10 is counter=10 & sr10 {popreg(sr10);}
+popmapsreg: icfg is counter=11 & icfg {popreg(icfg);}
+popmapsreg: usp is counter=12 & usp {popreg(usp);}
+popmapsreg: ssp is counter=13 & ssp {popreg(ssp);}
+popmapsreg: sp is counter=14 & sp {popreg(sp);}
+popmapsreg: pc is counter=15 & pc {popreg(pc);}
+
+# Push special registers based on counter
+pshmapsreg: reti is counter=0 & reti {pushreg(reti);}
+pshmapsreg: rete is counter=1 & rete {pushreg(rete);}
+pshmapsreg: retx is counter=2 & retx {pushreg(retx);}
+pshmapsreg: rets is counter=3 & rets {pushreg(rets);}
+pshmapsreg: sr4 is counter=4 & sr4 {pushreg(sr4);}
+pshmapsreg: psr is counter=5 & psr {pushreg(psr);}
+pshmapsreg: cnum is counter=6 & cnum {pushreg(cnum);}
+pshmapsreg: sr7 is counter=7 & sr7 {pushreg(sr7);}
+pshmapsreg: sr8 is counter=8 & sr8 {pushreg(sr8);}
+pshmapsreg: sr9 is counter=9 & sr9 {pushreg(sr9);}
+pshmapsreg: sr10 is counter=10 & sr10 {pushreg(sr10);}
+pshmapsreg: icfg is counter=11 & icfg {pushreg(icfg);}
+pshmapsreg: usp is counter=12 & usp {pushreg(usp);}
+pshmapsreg: ssp is counter=13 & ssp {pushreg(ssp);}
+pshmapsreg: sp is counter=14 & sp {pushreg(sp);}
+pshmapsreg: pc is counter=15 & pc {pushreg(pc);}
 
 # Bit ops
 next: is epsilon [counter=counter+1;]{}
@@ -67,6 +93,8 @@ pshmreg: pshmapreg is pshmapreg & bitset=1 [sep=1;]{}
 pshmreg: is bitset=0 {}
 popmreg: popmapreg is popmapreg & bitset=1 [sep=1;]{}
 popmreg: is bitset=0 {}
+pshmsreg: pshmapsreg is pshmapsreg & bitset=1 [sep=1;]{}
+pshmsreg: is bitset=0 {}
 popmsreg: popmapsreg is popmapsreg & bitset=1 [sep=1;]{}
 popmsreg: is bitset=0 {}
 msep: "," is  sep=1 & bitset=1 {}
@@ -85,11 +113,21 @@ popmapregs: popmapregs^popmreg^msep is counter<15 & mregread & msep & popmreg & 
 popmapregs: popmreg is counter=15 & mregread & popmreg {}
 popmap: popmapregs is popmapregs [bitset=0; counter=0; sep=0;] {}
 
-# Recursively generate our pop special registers
-popmapsregs: popmapsregs^popmsreg^msep is counter<3 & msregread & msep & popmsreg & next & popmapsregs
+# Recursively generate our special registers (for 32-bit instructions)
+pshmapsregs: pshmapsregs^pshmsreg^msep is counter<15 & mregread & msep & pshmsreg & next & pshmapsregs
+    { build pshmapsregs; build pshmsreg; }
+pshmapsregs: pshmsreg is counter=15 & mregread & pshmsreg {}
+pshsrmap: pshmapsregs is pshmapsregs [bitset=0; counter=0; sep=0;]{}
+
+popmapsregs: popmapsregs^popmsreg^msep is counter<15 & mregread & msep & popmsreg & next & popmapsregs
     { build popmsreg; build popmapsregs; }
-popmapsregs: popmsreg^msep is counter=3 & msep & msregread & popmsreg {}
+popmapsregs: popmsreg is counter=15 & mregread & popmsreg {}
 popsrmap: popmapsregs is popmapsregs [bitset=0; counter=0; sep=0;]{}
+
+popmapsregs16: popmapsregs16^popmsreg^msep is counter<3 & msregread & msep & popmsreg & next & popmapsregs16
+    { build popmsreg; build popmapsregs16; }
+popmapsregs16: popmsreg is counter=3 & msregread & popmsreg {}
+popsrmap16: popmapsregs16 is popmapsregs16 [bitset=0; counter=0; sep=0;]{}
 
 #######################################
 # Registers boundary to register list
@@ -251,10 +289,10 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 # {sregs...} = [sp++]
 # => pop {sregs...}
 #
-:pop {popsrmap} is group=0 & ins0412=0x048 ... & popsrmap
+:pop {popsrmap16} is group=0 & ins0412=0x048 ... & popsrmap16
 {
     mult_addr = sp;
-    build popsrmap;
+    build popsrmap16;
     sp = mult_addr;
 }
 
@@ -340,22 +378,51 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 }
 
 #
-# [sp+imm5] = rA
+# [--sp] = {sregs}
+# => push {sregs}
+#
+:push {pshsrmap} is group=7 & ins0011=0x958 ; pshsrmap
+{
+    mult_addr = sp;
+    build pshsrmap;
+    sp = mult_addr;
+}
+
+#
+# {sregs} = [sp++]
+# => pop {sregs}
+#
+:pop {popsrmap} is group=7 & ins0011=0x950 ; popsrmap
+{
+    mult_addr = sp;
+    build popsrmap;
+    sp = mult_addr;
+}
+
+#
+# [sp] = rA
 # => sw rA, [sp]
 #
-:sw regA, ["sp"] is group=1 & ins0407=0x8 & regA & imm0812=0
+:sw regA, ["sp"] is group=1 & ins0707=1 & ins0606=0 & imm0505=0 & ins0404=0 & regA & imm0812=0
 {
     *:4 sp = regA;
 }
 
 #
-# [sp+imm5] = rA
-# => sw rA, [sp+imm5]
+# [sp+imm6] = rA
+# => sw rA, [sp+imm6]
 #
-:sw regA, ["sp"+imm5] is group=1 & ins0407=0x8 & regA & imm0812>0 & imm0812
-[ imm5 = imm0812 * 4; ]
+:sw regA, ["sp"+imm6] is group=1 & ins0707=1 & ins0606=0 & imm0505=0 & ins0404=0 & regA & imm0812>0 & imm0812
+[ imm6 = imm0812 * 4; ]
 {
-    addr:4 = sp + imm5;
+    addr:4 = sp + imm6;
+    *:4 addr = regA;
+}
+
+:sw regA, ["sp"+imm6] is group=1 & ins0707=1 & ins0606=0 & imm0505=1 & ins0404=0 & regA & imm0812
+[ imm6 = ((1 << 5) | imm0812) * 4; ]
+{
+    addr:4 = sp + imm6;
     *:4 addr = regA;
 }
 
@@ -371,13 +438,20 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 }
 
 #
-# rA = [sp+#imm5]
-# => lw rA, [sp+imm5]
+# rA = [sp+#imm6]
+# => lw rA, [sp+imm6]
 #
-:lw regA, ["sp"+imm5] is group=1 & ins0407=0 & regA & imm0812>0 & imm0812
-[ imm5 = imm0812 * 4; ]
+:lw regA, ["sp"+imm6] is group=1 & ins0707=0 & ins0606=0 & imm0505=0 & ins0404=0 & regA & imm0812>0 & imm0812
+[ imm6 = imm0812 * 4; ]
 {
-    local addr:4 = sp + imm5;
+    local addr:4 = sp + imm6;
+    regA = *:4 addr;
+}
+
+:lw regA, ["sp"+imm6] is group=1 & ins0707=0 & ins0606=0 & imm0505=1 & ins0404=0 & regA & imm0812
+[ imm6 = ((1 << 5) | imm0812) * 4; ]
+{
+    local addr:4 = sp + imm6;
     regA = *:4 addr;
 }
 
@@ -450,7 +524,7 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 # rA = [sp+#imm5]
 # => lw rA, [sp+imm5]
 #
-:lw regA, ["sp"] is group=1 & ins0407=0 & regA & imm0812=0
+:lw regA, ["sp"] is group=1 & ins0707=0 & ins0606=0 & imm0505=0 & ins0404=0 & regA & imm0812=0
 {
     regA = *:4 sp;
 }
