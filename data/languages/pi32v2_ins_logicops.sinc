@@ -237,7 +237,7 @@
 # rA <= insert(rB, pos:imm5, len:imm5) # special case
 # insert regA, regB, pos, len
 #
-:insert regA, eregA, imm2327, imm1822 is group=7 & ins0411=0x1a & regA ; eregA & imm1617 & imm1822 & imm2327
+:insert regA, eregA, imm2327, imm1822 is group=7 & ins0411=0x1a & regA ; eregA & imm1617=0 & imm1822 & imm2327
 {
     # Create a bitmask for source register
     smask = ((1 << imm1822) - 1) & 0xffffffff;

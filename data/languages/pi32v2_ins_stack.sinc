@@ -343,7 +343,7 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 # [sp+imm5] = rA
 # => sw rA, [sp]
 #
-:sw regA, [sp] is group=1 & ins0407=0x8 & regA & imm0812=0 & sp
+:sw regA, ["sp"] is group=1 & ins0407=0x8 & regA & imm0812=0
 {
     *:4 sp = regA;
 }
@@ -352,7 +352,7 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 # [sp+imm5] = rA
 # => sw rA, [sp+imm5]
 #
-:sw regA, [sp+imm5] is group=1 & ins0407=0x8 & regA & imm0812>0 & imm0812 & sp
+:sw regA, ["sp"+imm5] is group=1 & ins0407=0x8 & regA & imm0812>0 & imm0812
 [ imm5 = imm0812 * 4; ]
 {
     addr:4 = sp + imm5;
@@ -360,13 +360,13 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 }
 
 #
-# [sp+imm8] = rA
-# => sw rA, [sp+imm8]
+# [sp+imm12] = rA
+# => sw rA, [sp+imm12]
 #
-:sw eregA, [sp+imm8] is group=7 & ins0011=0x9d4 & sp ; eregA & imm1616=1 & imm1719 & imm2427
-[ imm8 = (imm1719 << 1) | (imm2427 << 4); ]
+:sw eregA, ["sp"+imm12] is group=7 & ins0011=0x9d4 ; eregA & imm1617=1 & imm1827
+[ imm12 = imm1827 << 2; ]
 {
-    addr:4 = sp + imm8;
+    local addr:4 = sp + imm12;
     *:4 addr = eregA;
 }
 
@@ -374,21 +374,21 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 # rA = [sp+#imm5]
 # => lw rA, [sp+imm5]
 #
-:lw regA, [sp+imm5] is group=1 & ins0407=0 & regA & imm0812>0 & imm0812 & sp
+:lw regA, ["sp"+imm5] is group=1 & ins0407=0 & regA & imm0812>0 & imm0812
 [ imm5 = imm0812 * 4; ]
 {
-    addr:4 = sp + imm5;
+    local addr:4 = sp + imm5;
     regA = *:4 addr;
 }
 
 #
-# rA = [sp+imm8]
-# => lw rA, [sp+imm8]
+# rA = [sp+imm12]
+# => lw rA, [sp+imm12]
 #
-:lw eregA, [sp+imm8] is group=7 & ins0011=0x9d4 & sp ; eregA & imm1616=0 & imm1719 & imm2427
-[ imm8 = (imm1719 << 1) | (imm2427 << 4); ]
+:lw eregA, ["sp"+imm12] is group=7 & ins0011=0x9d4 ; eregA & imm1617=0 & imm1827
+[ imm12 = imm1827 << 2; ]
 {
-    addr:4 = sp + imm8;
+    local addr:4 = sp + imm12;
     eregA = *:4 addr;
 }
 
@@ -396,10 +396,10 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 # d[sp+imm12] = rB_rA
 # => sdw rB_rA, [sp+imm12]
 #
-:sdw edregA, [sp+imm12] is group=7 & ins0011=0x9d0 & sp; edregA & imm1616=1 & imm1627
-[ imm12 = (imm1627 & 0xffe); ]
+:sdw edregA, ["sp"+imm12] is group=7 & ins0011=0x9d0 ; edregA & imm1617=1 & imm1827
+[ imm12 = imm1827 << 2; ]
 {
-    addr:4 = sp + imm12;
+    local addr:4 = sp + imm12;
     *:8 addr = edregA;
 }
 
@@ -407,10 +407,10 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 # h[sp+imm12] = rA
 # => sh rA, [sp+imm12]
 #
-:sh eregA, [sp+imm12] is group=7 & ins0011=0x9d8 & sp; eregA & imm1616=1 & imm1627
-[ imm12 = (imm1627 & 0xffe); ]
+:sh eregA, ["sp"+imm12] is group=7 & ins0011=0x9d8 ; eregA & imm1616=1 & imm1727
+[ imm12 = (imm1727 << 1); ]
 {
-    addr:4 = sp + imm12;
+    local addr:4 = sp + imm12;
     *:2 addr = eregA:2;
 }
 
@@ -418,9 +418,9 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 # b[sp+imm12] = rA
 # => sb rA, [sp+imm12]
 #
-:sb eregA, [sp+imm1627] is group=7 & ins0011=0x9de & sp; eregA & imm1627
+:sb eregA, ["sp"+imm1627] is group=7 & ins0011=0x9de ; eregA & imm1627
 {
-    addr:4 = sp + imm1627;
+    local addr:4 = sp + imm1627;
     *:1 addr = eregA:1;
 }
 
@@ -428,9 +428,9 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 # rA = b[sp+imm12] (s)
 # => lb.s rA, [sp+imm12] (signed)
 #
-:lb.s eregA, [sp+imm1627] is group=7 & ins0011=0x9dd & sp ; eregA & imm1627
+:lb.s eregA, ["sp"+imm1627] is group=7 & ins0011=0x9dd ; eregA & imm1627
 {
-    addr:4 = sp + imm1627;
+    local addr:4 = sp + imm1627;
     eregA = sext(*:1 addr);
 }
 
@@ -439,10 +439,10 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 # rB_rA = d[sp+imm12]
 # => ldw rB_rA, [sp+imm12]
 #
-:ldw edregA, [sp+imm12] is group=7 & ins0011=0x9d0 & sp; edregA & imm1616=0 & imm1627
-[ imm12 = (imm1627 & 0xffe); ]
+:ldw edregA, ["sp"+imm12] is group=7 & ins0011=0x9d0 ; edregA & imm1617=0 & imm1827
+[ imm12 = imm1827 << 2; ]
 {
-    addr:4 = sp + imm12;
+    local addr:4 = sp + imm12;
     edregA = *:8 addr;
 }
 
@@ -450,7 +450,7 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 # rA = [sp+#imm5]
 # => lw rA, [sp+imm5]
 #
-:lw regA, [sp] is group=1 & ins0407=0 & regA & imm0812=0 & sp
+:lw regA, ["sp"] is group=1 & ins0407=0 & regA & imm0812=0
 {
     regA = *:4 sp;
 }
@@ -458,21 +458,21 @@ poppcregs: {pc,popreglist4} is popreglist4 & pc & ins0003
 
 #
 # rA = h[sp+imm12] (u)
-# => lh rA, [sp+imm12]
+# => lh.z rA, [sp+imm12]
 #
-:lh eregA, [sp+imm12] is group=7 & ins0011=0x9d8 & sp; eregA & imm1616=0 & imm1627
-[ imm12 = (imm1627 & 0xffe); ]
+:lh.z eregA, ["sp"+imm12] is group=7 & ins0011=0x9d8 ; eregA & imm1616=0 & imm1727
+[ imm12 = (imm1727 << 1); ]
 {
-    addr:4 = sp + imm12;
-    eregA = *:2 addr;
+    local addr:4 = sp + imm12;
+    eregA = zext(*:2 addr);
 }
 
 #
-# rA = [sp+imm12] (unsigned)
-# => lb rA, [sp+imm12]
+# rA = b[sp+imm12] (u)
+# => lb.z rA, [sp+imm12]
 #
-:lb eregA, [sp+imm1627] is group=7 & ins0011=0x9dc & sp; eregA & imm1627
+:lb.z eregA, ["sp"+imm1627] is group=7 & ins0011=0x9dc ; eregA & imm1627
 {
-    addr:4 = sp + imm1627;
-    eregA = *:1 addr;
+    local addr:4 = sp + imm1627;
+    eregA = zext(*:1 addr);
 }
