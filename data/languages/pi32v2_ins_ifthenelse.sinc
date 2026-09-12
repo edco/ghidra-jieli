@@ -46,9 +46,9 @@
 }
 
 #
-# if (rA != #imm1623) then { ... } else { ... }
+# if (rA != #packedimm12) then { ... } else { ... }
 #
-:if (regA != #imm1623) { is group=7 & ins0411=0x8B & regA ; imm2427=0 & imm1623 & ifcnt & elsecnt
+:if (regA != #packedimm12) { is group=7 & ins0411=0x8A & regA ; packedimm12 & ifcnt & elsecnt
 [
     # Save instructions count for then and else branches
     thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
@@ -57,7 +57,28 @@
     ifblock=1; globalset(inst_next, ifblock);
 ]
 {
-    if (regA == imm1623) goto <else>;
+    if (regA == packedimm12) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+#
+# if (rA != #imm1627s) then { ... } else { ... }
+#
+:if (regA != #imm1627s) { is group=7 & ins0411=0x8B & regA ; imm1627s & ifcnt & elsecnt
+[
+    # Save instructions count for then and else branches
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA == imm1627s) goto <else>;
     cres=1;
     goto <end>;
 
@@ -278,6 +299,27 @@
 }
 
 #
+# if (rA < imm1627) { ... } else { ... }
+#
+:if (regA < imm1627) { is group=7 & ins0411=0x9B & regA ; imm1627 & ifcnt & elsecnt
+[
+    # Save instructions count for then and else branches
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA >= imm1627) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+#
 # if (rA >= #packedimm12) { ... } else { ... }
 #
 :if (regA >= #packedimm12) { is group=7 & ins0411=0x92 & regA ; packedimm12 & ifcnt & elsecnt
@@ -353,6 +395,27 @@
 ]
 {
     if (regA s>= eregC) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+#
+# ifs (rA > rB) then { ... } else { ... }
+#
+:ifs (regA > eregC) { is group=7 & ins0411=0xE1 & regA ; eregC & imm1623=0 & ifcnt & elsecnt
+[
+    # Save instructions count for then and else branches
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA s<= eregC) goto <else>;
     cres=1;
     goto <end>;
 
@@ -521,6 +584,143 @@
 ]
 {
     if ((regA & eregC) == 0) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+##############################################
+# Floating-Point Conditional Blocks (iff)
+##############################################
+
+#
+# iff (rA > rB) then { ... } else { ... }
+#
+:iff (regA > eregC) { is group=7 & ins0411=0xE1 & regA ; eregC & imm1623=0x80 & ifcnt & elsecnt
+[
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA f<= eregC) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+#
+# iff (rA >= rB) then { ... } else { ... }
+#
+:iff (regA >= eregC) { is group=7 & ins0411=0xD1 & regA ; eregC & imm1623=0x80 & ifcnt & elsecnt
+[
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA f< eregC) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+#
+# iff (rA == rB) then { ... } else { ... }
+#
+:iff (regA == eregC) { is group=7 & ins0411=0x81 & regA ; eregC & imm1623=0x80 & ifcnt & elsecnt
+[
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA f!= eregC) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+#
+# iff (rA u!= rB) then { ... } else { ... }
+#
+:iff (regA "u!=" eregC) { is group=7 & ins0411=0x89 & regA ; eregC & imm1623=0x80 & ifcnt & elsecnt
+[
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA f== eregC) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+#
+# iff (rA u< rB) then { ... } else { ... }
+#
+:iff (regA "u<" eregC) { is group=7 & ins0411=0xD9 & regA ; eregC & imm1623=0x80 & ifcnt & elsecnt
+[
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA f>= eregC) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+#
+# iff (rA u<= rB) then { ... } else { ... }
+#
+:iff (regA "u<=" eregC) { is group=7 & ins0411=0xE9 & regA ; eregC & imm1623=0x80 & ifcnt & elsecnt
+[
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA f> eregC) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+#
+# iff (rA u>= rB) then { ... } else { ... }
+#
+:iff (regA "u>=" eregC) { is group=7 & ins0411=0x91 & regA ; eregC & imm1623=0x80 & ifcnt & elsecnt
+[
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA f< eregC) goto <else>;
     cres=1;
     goto <end>;
 
