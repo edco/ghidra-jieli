@@ -168,7 +168,7 @@
 #
 :muladd.s edregA, eregB, eregC is group=7 & ins0011=0x1fc ; edregA & eregB & eregC & imm1619=0 & imm2828=1
 {
-    # Zero-extend eregC and eregB
+    # Sign-extend eregC and eregB
     C:8 = sext(eregC);
     B:8 = sext(eregB); 
 
@@ -178,16 +178,16 @@
 
 #
 # rB_rA += rC * rD (unsigned)
-# => muladd.s rB_rA, rC, rD
+# => muladd.z rB_rA, rC, rD
 #
-:muladd.s edregA, eregB, eregC is group=7 & ins0011=0x1fc ; edregA & eregB & eregC & imm1619=0 & imm2828=0
+:muladd.z edregA, eregB, eregC is group=7 & ins0011=0x1fc ; edregA & eregB & eregC & imm1619=0 & imm2828=0
 {
     # Zero-extend eregC and eregB
     C:8 = zext(eregC);
     B:8 = zext(eregB); 
 
     # Multiply and add to edregA
-    edregA =edregA + C*B;
+    edregA = edregA + C*B;
 }
 
 
@@ -275,9 +275,9 @@
 
 #
 # rB_rA = rC * rD (signed)
-# => mul rB_rA, rC, rD
+# => mul.s rB_rA, rC, rD
 #
-:mul edregA, eregB, eregC is group=7 & ins0011=0x1f8 ; edregA & eregB & eregC & imm1619=0 & imm2828=0
+:mul.s edregA, eregB, eregC is group=7 & ins0011=0x1f8 ; edregA & eregB & eregC & imm1619=0 & imm2828=1
 {
     # Sign-extend eregC and eregB
     C:8 = sext(eregC);
@@ -290,9 +290,9 @@
 
 #
 # rB_rA = rC * rD (unsigned)
-# => mul rB_rA, rC, rD
+# => mul.z rB_rA, rC, rD
 #
-:mul.z edregA, eregB, eregC is group=7 & ins0011=0x1f8 ; edregA & eregB & eregC & imm1619=0 & imm2828=1
+:mul.z edregA, eregB, eregC is group=7 & ins0011=0x1f8 ; edregA & eregB & eregC & imm1619=0 & imm2828=0
 {
     # Zero-extend eregC and eregB
     C:8 = zext(eregC);
