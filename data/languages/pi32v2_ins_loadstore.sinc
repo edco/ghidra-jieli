@@ -272,20 +272,20 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 # rA = h[rB++=imm8] (u)
 # => lh.z rA, [rB++=imm8]
 #
-:lh.z eregA, [eregB++=imm8] is group=7 & ins0011=0xdd0 ; eregA & eregB & eregC & imm1619 & imm2427
-[ imm8 = (imm2427 << 4) | imm1619; ]
+:lh.z eregA, [eregB++=imm8] is group=7 & ins0011=0xdd0 ; eregA & eregB & imm1616=0 & imm1719 & imm2427
+[ imm8 = (imm2427 << 4) | (imm1719 << 1); ]
 {
-	local addr:4 = eregB + imm8;
-	eregA = zext(*:2 addr);
+	eregA = zext(*:2 eregB);
+	eregB = eregB + imm8;
 }
 
 #
 # rA = h[rB+imm9] (u)
 #
-:lh.z eregA, [eregB + imm9] is group=7 & ins0411=0xd5 & ins0203=0 & imm0000 ; eregA & imm2427 & eregB & imm1619
-[ imm9 = (imm0000 << 8) | (imm2427 << 4) | imm1619; ]
+:lh.z eregA, [eregB + imm9] is group=7 & ins0411=0xd5 & ins0203=0 & imm0001s ; eregA & imm2427 & eregB & imm1719 & imm1616=0
+[ imm9 = (imm0001s << 8) | (imm2427 << 4) | (imm1719 << 1); ]
 {
-    addr:4 = eregB + imm9;
+    local addr:4 = eregB + imm9;
     eregA = zext(*:2 addr);
 }
 
@@ -317,21 +317,21 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 # rA = h[rB++=imm8] (s)
 # => lh.s rA, [rB++=imm8]
 #
-:lh.s eregA, [eregB++=imm8] is group=7 & ins0011=0xdd4 ; eregA & eregB & eregC & imm1619 & imm2427
-[ imm8 = (imm2427 << 4) | imm1619; ]
+:lh.s eregA, [eregB++=imm8] is group=7 & ins0011=0xdd4 ; eregA & eregB & imm1616=0 & imm1719 & imm2427
+[ imm8 = (imm2427 << 4) | (imm1719 << 1); ]
 {
-	local addr:4 = eregB + imm8;
-	eregA = sext(*:2 addr);
+	eregA = sext(*:2 eregB);
+	eregB = eregB + imm8;
 }
 
 
 #
 # rA = h[rB+imm9] (s)
 #
-:lh.s eregA, [eregB + imm9] is group=7 & ins0411=0xd5 & ins0203=1 & imm0000 ; eregA & imm2427 & eregB & imm1619
-[ imm9 = (imm0000 << 8) | (imm2427 << 4) | imm1619; ]
+:lh.s eregA, [eregB + imm9] is group=7 & ins0411=0xd5 & ins0203=1 & imm0001s ; eregA & imm2427 & eregB & imm1719 & imm1616=0
+[ imm9 = (imm0001s << 8) | (imm2427 << 4) | (imm1719 << 1); ]
 {
-    addr:4 = eregB + imm9;
+    local addr:4 = eregB + imm9;
     eregA = sext(*:2 addr);
 }
 
@@ -364,9 +364,9 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 
 #
 # rA = b[rB+rC] (s)
-# => lb.z rA, [rB + rC]
+# => lb.s rA, [rB + rC]
 #
-:lb.z eregA, [eregB + eregC] is group=7 & ins0011=0xed8 ; eregA & eregB & eregC & imm1619=2
+:lb.s eregA, [eregB + eregC] is group=7 & ins0011=0xed8 ; eregA & eregB & eregC & imm1619=2
 {
 	local addr:4 = eregB + eregC;
 	eregA = sext(*:1 addr);
@@ -658,11 +658,21 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 #
 # h[rB+imm9s] = rAl
 #
-:sh eregA, [eregB + imm9s] is group=7 & ins0411=0xd5 & ins0203=0 & imm0002s ; eregA & imm2427 & eregB & imm1719 & imm1616=1
-[ imm9s = (imm0002s << 8) | (imm2427 << 4) | (imm1719 << 1); ]
+:sh eregA, [eregB + imm9s] is group=7 & ins0411=0xd5 & ins0203=0 & imm0001s ; eregA & imm2427 & eregB & imm1719 & imm1616=1
+[ imm9s = (imm0001s << 8) | (imm2427 << 4) | (imm1719 << 1); ]
 {
-    addr:4 = eregB + imm9s;
+    local addr:4 = eregB + imm9s;
     *:2 addr = eregA:2;
+}
+
+#
+# h[rB++=imm8] = rA
+#
+:sh eregA, [eregB++=imm8] is group=7 & ins0011=0xdd0 ; eregA & eregB & imm1616=1 & imm1719 & imm2427
+[ imm8 = (imm2427 << 4) | (imm1719 << 1); ]
+{
+    *:2 eregB = eregA:2;
+    eregB = eregB + imm8;
 }
 
 #
