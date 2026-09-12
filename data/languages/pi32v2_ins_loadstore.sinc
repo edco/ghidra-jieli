@@ -187,6 +187,15 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 }
 
 #
+# rA = [rB++=rC]
+#
+:lw regAl, [regBl ++= regCh] is group=0 & ins1012=2 & ins0303=0 & regAl & regBl & regCh
+{
+	regAl = *:4 regBl;
+	regBl = regBl + regCh;
+}
+
+#
 # rA = [rB+simm7m4]
 # => lw rA, [rB + simm7m4]
 #
@@ -330,6 +339,15 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 {
 	regAl = zext(*:2 regBl);
 	regBl = regBl - 2;
+}
+
+#
+# rA = h[rB++=rC] (u)
+#
+:lh.z regAl, [regBl ++= regCh] is group=0 & ins1012=3 & ins0303=0 & regAl & regBl & regCh
+{
+	regAl = zext(*:2 regBl);
+	regBl = regBl + regCh;
 }
 
 #
@@ -818,6 +836,15 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 }
 
 #
+# [rB++=rC] = rA
+#
+:sw regAl, [regBl ++= regCh] is group=0 & ins1012=2 & ins0303=1 & regAl & regBl & regCh
+{
+	*:4 regBl = regAl;
+	regBl = regBl + regCh;
+}
+
+#
 # [rB+simm7m4] = rA
 # => sw rA, [rB + simm7m4]
 #
@@ -938,6 +965,15 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 {
 	*:2 regBl = regAl:2;
 	regBl = regBl - 2;
+}
+
+#
+# h[rB++=rC] = rA
+#
+:sh regAl, [regBl ++= regCh] is group=0 & ins1012=3 & ins0303=1 & regAl & regBl & regCh
+{
+	*:2 regBl = regAl:2;
+	regBl = regBl + regCh;
 }
 
 #

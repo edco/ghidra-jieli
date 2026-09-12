@@ -369,6 +369,36 @@
 }
 
 #
+# rA.l = sat8(rB.l) (u)
+#
+:sat8.u eregA, eregC is group=7 & ins0011=0x074 ; eregA & eregC & imm1623=0
+{
+    local src:4 = eregC & 0xffff;
+    if (src > 0xff) goto <clamp>;
+    eregA = src;
+    goto inst_next;
+<clamp>
+    eregA = 0xff;
+}
+
+#
+# rA.l = sat8(rB.l) (s)
+#
+:sat8.s eregA, eregC is group=7 & ins0011=0x074 ; eregA & eregC & imm1623=1
+{
+    local src:4 = sext(eregC[0,16]);
+    if (src s> 0x7f) goto <clamp_hi>;
+    if (src s< -0x80) goto <clamp_lo>;
+    eregA = src & 0xffff;
+    goto inst_next;
+<clamp_hi>
+    eregA = 0x7f;
+    goto inst_next;
+<clamp_lo>
+    eregA = 0xff80;
+}
+
+#
 # rA = sat16(rB) (u)
 #
 :sat16.u eregA, eregC is group=7 & ins0011=0x078 ; eregA & eregC & imm1623=0
