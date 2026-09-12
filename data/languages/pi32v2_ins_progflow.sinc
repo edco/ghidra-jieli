@@ -517,11 +517,38 @@
 ##
 
 #
-# ifs (rA < imm12) goto pcrel16sm2
+# ifs (rA >= #imm12) goto pcrel16sm2
 #
-:jb eregA, #imm1627, jaddr16e is group=7 & ins0012=0x1f0b ; eregA & imm1627 ; jaddr16e
+:jge eregA, #imm1627s, jaddr16e is group=7 & ins0012=0x1f0a ; eregA & imm1627s ; jaddr16e
 {
-    if (eregA s< imm1627)
+    if (eregA s>= imm1627s)
+        goto jaddr16e;
+}
+
+#
+# ifs (rA < #imm12) goto pcrel16sm2
+#
+:jl eregA, #imm1627s, jaddr16e is group=7 & ins0012=0x1f0b ; eregA & imm1627s ; jaddr16e
+{
+    if (eregA s< imm1627s)
+        goto jaddr16e;
+}
+
+#
+# ifs (rA > #imm12) goto pcrel16sm2
+#
+:jg eregA, #imm1627s, jaddr16e is group=7 & ins0012=0x1f0c ; eregA & imm1627s ; jaddr16e
+{
+    if (eregA s> imm1627s)
+        goto jaddr16e;
+}
+
+#
+# ifs (rA <= #imm12) goto pcrel16sm2
+#
+:jle eregA, #imm1627s, jaddr16e is group=7 & ins0012=0x1f0d ; eregA & imm1627s ; jaddr16e
+{
+    if (eregA s<= imm1627s)
         goto jaddr16e;
 }
 
@@ -740,29 +767,38 @@
 ##
 
 #
+# ifs (rA >= #packedimm32) goto pcrel16sm2
+#
+:jge eregA, #packedimm12, jaddr16e is group=7 & ins0012=0x1f2a ; eregA & packedimm12 ; jaddr16e
+{
+    if (eregA s>= packedimm12)
+        goto jaddr16e;
+}
+
+#
 # ifs (rA < #packedimm32) goto pcrel16sm2
 #
-:jb eregA, #packedimm12, jaddr16e is group=7 & ins0012=0x1f2b ; eregA & packedimm12 ; jaddr16e
+:jl eregA, #packedimm12, jaddr16e is group=7 & ins0012=0x1f2b ; eregA & packedimm12 ; jaddr16e
 {
     if (eregA s< packedimm12)
         goto jaddr16e;
 }
 
 #
-# ifs (rA <= #packedimm32) goto pcrel16sm2
+# ifs (rA > #packedimm32) goto pcrel16sm2
 #
-:jbe eregA, #packedimm12, jaddr16e is group=7 & ins0012=0x1f0d ; eregA & packedimm12 ; jaddr16e
+:jg eregA, #packedimm12, jaddr16e is group=7 & ins0012=0x1f2c ; eregA & packedimm12 ; jaddr16e
 {
-    if (eregA s<= packedimm12)
+    if (eregA s> packedimm12)
         goto jaddr16e;
 }
 
 #
-# ifs (rA >= #packedimm32) goto pcrel16sm2
+# ifs (rA <= #packedimm32) goto pcrel16sm2
 #
-:jae eregA, #packedimm12, jaddr16e is group=7 & ins0012=0x1f2a ; eregA & packedimm12 ; jaddr16e
+:jle eregA, #packedimm12, jaddr16e is group=7 & ins0012=0x1f2d ; eregA & packedimm12 ; jaddr16e
 {
-    if (eregA s>= packedimm12)
+    if (eregA s<= packedimm12)
         goto jaddr16e;
 }
 

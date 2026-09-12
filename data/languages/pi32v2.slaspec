@@ -197,6 +197,7 @@ define token instr2(16)
     imm1819 = (2,3)
     imm1822 = (2,6)
     imm1823 = (2,7)
+    imm1823s = (2,7) signed
     imm2023 = (4,7)
     imm2325 = (7, 9)
     imm2327 = (7,11)

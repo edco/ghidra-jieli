@@ -229,3 +229,50 @@
 {
     eregA = (eregB << imm6) >> imm6;
 }
+
+###########################################################################################
+# Memory shift operations
+###########################################################################################
+
+shamt4_32: "32" is imm2427=0 { local c:4 = 32; export c; }
+shamt4_32: imm2427 is imm2427 { local c:4 = imm2427; export c; }
+
+#
+# [rA+offset] <<= shamt
+#
+:lsl [eregA+offset], shamt4_32 is group=7 & ins0011=0x86c ; eregA & shamt4_32 & imm1823s & imm1617=0
+[ offset = imm1823s << 2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr << shamt4_32;
+}
+
+#
+# [rA+offset] <<<= shamt
+#
+:qasl [eregA+offset], shamt4_32 is group=7 & ins0011=0x86c ; eregA & shamt4_32 & imm1823s & imm1617=1
+[ offset = imm1823s << 2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr << shamt4_32;
+}
+
+#
+# [rA+offset] >>= shamt
+#
+:lsr [eregA+offset], shamt4_32 is group=7 & ins0011=0x86c ; eregA & shamt4_32 & imm1823s & imm1617=2
+[ offset = imm1823s << 2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr >> shamt4_32;
+}
+
+#
+# [rA+offset] >>>= shamt
+#
+:qasr [eregA+offset], shamt4_32 is group=7 & ins0011=0x86c ; eregA & shamt4_32 & imm1823s & imm1617=3
+[ offset = imm1823s << 2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr s>> shamt4_32;
+}

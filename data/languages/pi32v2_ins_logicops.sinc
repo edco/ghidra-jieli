@@ -29,8 +29,8 @@
 #
 # [rA+imm8] |= rB
 #
-:or [eregA+offset], eregC is group=7 & ins0011=0x864 ; eregA & eregC & imm1823 & imm1617=0
-[ offset = imm1823<<2; ]
+:or [eregA+offset], eregC is group=7 & ins0011=0x864 ; eregA & eregC & imm1823s & imm1617=0
+[ offset = imm1823s<<2; ]
 {
     addr:4 = eregA + offset;
     *:4 addr = *:4 addr | eregC;
@@ -73,6 +73,16 @@
 :xor eregA, eregB, eregC is group=7 & ins0011=0x190 ; eregA & eregB & eregC & imm1619=1
 {
     eregA = eregB ^ eregC;
+}
+
+#
+# [rA+imm8] ^= rB
+#
+:xor [eregA+offset], eregC is group=7 & ins0011=0x864 ; eregA & eregC & imm1823s & imm1617=1
+[ offset = imm1823s<<2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr ^ eregC;
 }
 
 #
@@ -212,8 +222,8 @@
 #
 # [rA+imm8] &= rB
 #
-:and [eregA+offset], eregC is group=7 & ins0011=0x864 ; eregA & eregC & imm1823 & imm1617=2
-[ offset = imm1823<<2; ]
+:and [eregA+offset], eregC is group=7 & ins0011=0x864 ; eregA & eregC & imm1823s & imm1617=2
+[ offset = imm1823s<<2; ]
 {
     addr:4 = eregA + offset;
     *:4 addr = *:4 addr & eregC;
@@ -222,8 +232,8 @@
 #
 # [rA+imm8] &= not(rB)
 #
-:and [eregA+offset], ~eregC is group=7 & ins0011=0x864 ; eregA & eregC & imm1823 & imm1617=3
-[ offset = imm1823<<2; ]
+:and [eregA+offset], ~eregC is group=7 & ins0011=0x864 ; eregA & eregC & imm1823s & imm1617=3
+[ offset = imm1823s<<2; ]
 {
     addr:4 = eregA + offset;
     *:4 addr = *:4 addr & (~eregC);
