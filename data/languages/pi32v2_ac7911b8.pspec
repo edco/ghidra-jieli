@@ -13,6 +13,25 @@
     </context_set>
   </context_data>
 
+  <volatile outputop="write_volatile" inputop="read_volatile">
+    <!-- Peripheral Memory-Mapped Registers (LSFR, BSFR, HSFR, PSFR, CSFR) -->
+    <range space="ram" first="0x00010000" last="0x0001ffff" />
+    <range space="ram" first="0x00020000" last="0x0002ffff" />
+    <range space="ram" first="0x00040000" last="0x0004ffff" />
+    <range space="ram" first="0x00050000" last="0x0005ffff" />
+    <range space="ram" first="0x01ee0000" last="0x01eeffff" />
+  </volatile>
+
+  <inferptrbounds>
+    <!-- Inform decompiler of valid pointer ranges to prevent treating memory addresses as scalar integers -->
+    <range space="ram" first="0x00010000" last="0x0005ffff" />
+    <range space="ram" first="0x01c00000" last="0x01c80000" />
+    <range space="ram" first="0x01ee0000" last="0x01eeffff" />
+    <range space="ram" first="0x01f20000" last="0x01f40000" />
+    <range space="ram" first="0x02000000" last="0x02800000" />
+    <range space="ram" first="0x04000000" last="0x04200000" />
+  </inferptrbounds>
+
   <default_memory_blocks>
     <!-- AC7911B8 System Memory Architecture -->
     <!-- Flash Memory: 8 MBytes (64 MBit SPI NorFlash mapped via SFC) -->
