@@ -541,13 +541,19 @@ elseinst:^parainst is parainst
 }
 
 # Processing `then` instructions while we have more than 1 inst.
-cdtinst:^theninst is thenbranch>1 & theninst {}
+cdtinst:^theninst is thenbranch>1 & theninst
+{
+    build theninst;
+}
 
 # Last instruction in the `then` branch, set `closebracket` to
 # force the next instruction to include a closing bracket (cap'n obvious).
 # We don't close the if block as we have some instructions in the else branch.
 cdtinst:^theninst is thenbranch=1 & theninst & elsebranch>0
-    [ closebracket=1; globalset(inst_next, closebracket); ]{}
+    [ closebracket=1; globalset(inst_next, closebracket); ]
+{
+    build theninst;
+}
 
 # Last instruction in the `then` branch, set `closebracket` to
 # force the next instruction to include a closing bracket (cap'n obvious).
@@ -556,7 +562,10 @@ cdtinst:^theninst is thenbranch=1 & theninst & elsebranch=0
     [
         closebracket=1; globalset(inst_next, closebracket);
         ifblock=0; globalset(inst_next, ifblock);
-    ]{}
+    ]
+{
+    build theninst;
+}
 
 ## We are out of the `then` branch and we don't have any `else`
 ## branch, let's insert a bracket and get back to normal by
@@ -570,17 +579,26 @@ cdtinst:^theninst is thenbranch=1 & theninst & elsebranch=0
 # Otherwise, we are done with our `then` branch and switch to our
 # `else` branch.
 cdtinst:^"} else { " elseinst is thenbranch=0 & elsebranch>1 & elseinst & closebracket=1
-    [ closebracket=0; globalset(inst_next, closebracket); ]{}
+    [ closebracket=0; globalset(inst_next, closebracket); ]
+{
+    build elseinst;
+}
 
 # Special case: else branch only has a single instruction (keep closebracket to 1)
 cdtinst:^"} else { " elseinst is thenbranch=0 & elsebranch=1 & elseinst & closebracket=1
     [
         ifblock=0; globalset(inst_next, ifblock);
         closebracket=1; globalset(inst_next, closebracket);
-    ]{}
+    ]
+{
+    build elseinst;
+}
 
 # Other instructions in else branch
-cdtinst:^elseinst is thenbranch=0 & elsebranch>1 & closebracket=0 & elseinst {}
+cdtinst:^elseinst is thenbranch=0 & elsebranch>1 & closebracket=0 & elseinst
+{
+    build elseinst;
+}
 
 # Last instruction of our `else` branch forces a close bracket for the next one
 # We also consider our if structure closed.
@@ -588,10 +606,16 @@ cdtinst:^elseinst is thenbranch=0 & elsebranch=1 & elseinst & closebracket=0
     [
         closebracket=1; globalset(inst_next, closebracket);
         ifblock=0; globalset(inst_next, ifblock);
-    ]{}
+    ]
+{
+    build elseinst;
+}
 
 # Conditional instruction
-:^cdtinst is phase=0 & ifblock=1 & cdtinst [phase=1;]{}
+:^cdtinst is phase=0 & ifblock=1 & cdtinst [phase=1;]
+{
+    build cdtinst;
+}
 
 # Default case, we are not processing a conditional instruction.
 :^parainst is parainst & phase=0 & ifblock=0 & closebracket=0 [phase=1;]

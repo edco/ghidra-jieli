@@ -916,10 +916,7 @@
 :rep nwords, regA is group=0 & ins0812=0x03 & regA & imm0407
 [ nwords = (imm0407 << 1) + 2; ]
 {
-    # Skip instructions if counter is zero
-    if (regA == 0) goto inst_next;
-        regA = regA - 1;
-    delayslot(nwords);
+    RepeatBlock(nwords:4, regA);
 }
 
 #
