@@ -276,3 +276,146 @@ shamt4_32: imm2427 is imm2427 { local c:4 = imm2427; export c; }
     addr:4 = eregA + offset;
     *:4 addr = *:4 addr s>> shamt4_32;
 }
+
+###########################################################################################
+# Memory shift operations by register
+###########################################################################################
+
+#
+# [rA+offset] <<= rB  (memory shift left by register)
+#
+:lsl [eregA+offset], eregC is group=7 & ins0011=0x86e ; eregA & eregC & imm1823s & imm1617=0
+[ offset = imm1823s << 2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr << eregC;
+}
+
+#
+# [rA+offset] <<<= rB  (memory arithmetic shift left by register)
+#
+:qasl [eregA+offset], eregC is group=7 & ins0011=0x86e ; eregA & eregC & imm1823s & imm1617=1
+[ offset = imm1823s << 2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr << eregC;
+}
+
+#
+# [rA+offset] >>= rB  (memory shift right by register)
+#
+:lsr [eregA+offset], eregC is group=7 & ins0011=0x86e ; eregA & eregC & imm1823s & imm1617=2
+[ offset = imm1823s << 2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr >> eregC;
+}
+
+#
+# [rA+offset] >>>= rB  (memory arithmetic shift right by register)
+#
+:qasr [eregA+offset], eregC is group=7 & ins0011=0x86e ; eregA & eregC & imm1823s & imm1617=3
+[ offset = imm1823s << 2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr s>> eregC;
+}
+
+###########################################################################################
+# Rotate operations (register-register)
+###########################################################################################
+
+#
+# rA = rB <> rC  (rotate right by register)
+#
+:ror eregA, eregB, eregC is group=7 & ins0011=0x1cc ; eregA & eregC & eregB & imm1619=0
+{
+    local shamt:4 = eregC & 0x1f;
+    eregA = (eregB >> shamt) | (eregB << (32 - shamt));
+}
+
+#
+# rA = rB <c> rC  (rotate right through carry by register)
+#
+:rorc eregA, eregB, eregC is group=7 & ins0011=0x1cc ; eregA & eregC & eregB & imm1619=1
+{
+    local shamt:4 = eregC & 0x1f;
+    local c:4 = zext($(C));
+    local val:8 = (zext(eregB) << 1) | zext(c);
+    val = (val >> shamt) | (val << (33 - shamt));
+    $(C) = val[0,1];
+    eregA = val[1,32];
+}
+
+###########################################################################################
+# 64-bit pair shift operations
+###########################################################################################
+
+shamt6_64: "64" is imm1621=0 { local c:4 = 64; export c; }
+shamt6_64: imm1621 is imm1621 { local c:4 = imm1621; export c; }
+
+#
+# rD <<<= imm6 (64-bit pair arithmetic shift left immediate)
+#
+:qasl edregA, shamt6_64 is group=7 & ins0011=0x1d0 ; edregA & imm2227=0x10 & shamt6_64
+{
+    local s:4 = shamt6_64;
+    edregA = edregA << s;
+}
+
+#
+# rD <>= imm6 (64-bit pair rotate right immediate)
+#
+:ror edregA, shamt6_64 is group=7 & ins0011=0x1d4 ; edregA & imm2227=0x00 & shamt6_64
+{
+    local s:8 = zext(shamt6_64 & 0x3f);
+    if (s == 0) goto <done>;
+    edregA = (edregA >> s) | (edregA << (64 - s));
+<done>
+}
+
+#
+# rD <c>= imm6 (64-bit pair rotate right through carry immediate)
+#
+:rorc edregA, shamt6_64 is group=7 & ins0011=0x1d4 ; edregA & imm2227=0x20 & shamt6_64
+{
+    local s:8 = zext(shamt6_64 & 0x3f);
+    if (s == 0) goto <done>;
+    local val:8 = edregA;
+    $(C) = val[0,1];
+    edregA = (val >> s) | (val << (64 - s));
+<done>
+}
+
+#
+# rD <<<= rC (64-bit pair arithmetic shift left by register)
+#
+:qasl edregA, eregC is group=7 & ins0011=0x1d8 ; edregA & eregC & imm1619=1
+{
+    local s:4 = eregC & 0x3f;
+    edregA = edregA << s;
+}
+
+#
+# rD <>= rC (64-bit pair rotate right by register)
+#
+:ror edregA, eregC is group=7 & ins0011=0x1dc ; edregA & eregC & imm1619=0
+{
+    local s:8 = zext(eregC & 0x3f);
+    if (s == 0) goto <done>;
+    edregA = (edregA >> s) | (edregA << (64 - s));
+<done>
+}
+
+#
+# rD <c>= rC (64-bit pair rotate right through carry by register)
+#
+:rorc edregA, eregC is group=7 & ins0011=0x1dc ; edregA & eregC & imm1619=1
+{
+    local s:8 = zext(eregC & 0x3f);
+    if (s == 0) goto <done>;
+    local val:8 = edregA;
+    $(C) = val[0,1];
+    edregA = (val >> s) | (val << (64 - s));
+<done>
+}

@@ -207,3 +207,163 @@
 {
     eregA = floor(eregC);
 }
+
+###########################################################################################
+# Double-Precision (64-bit) Floating Point Operations
+###########################################################################################
+
+#
+# rD = rD + rD (f, 64-bit)
+#
+:fadd edregA, edregB, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & edregB & imm1619=0
+{
+    edregA = edregB f+ edregC;
+}
+
+#
+# rD = rD - rD (f, 64-bit)
+#
+:fsub edregA, edregB, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & edregB & imm1619=1
+{
+    edregA = edregB f- edregC;
+}
+
+#
+# rD = rD * rD (f, 64-bit)
+#
+:fmul edregA, edregB, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & edregB & imm1619=2
+{
+    edregA = edregB f* edregC;
+}
+
+#
+# rD = rD / rD (f, 64-bit)
+#
+:fdiv edregA, edregB, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & edregB & imm1619=3
+{
+    edregA = edregB f/ edregC;
+}
+
+#
+# fcmp rD, rD (64-bit)
+#
+:fcmp edregB, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregC & edregB & imm1619=4
+{
+    FloatCompare(edregB, edregC);
+}
+
+#
+# rD = fmin(rD, rD) (64-bit)
+#
+:fmin edregA, edregB, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & edregB & imm1619=5
+{
+    edregA = FloatMin(edregB, edregC);
+}
+
+#
+# rD = fmax(rD, rD) (64-bit)
+#
+:fmax edregA, edregB, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & edregB & imm1619=6
+{
+    edregA = FloatMax(edregB, edregC);
+}
+
+#
+# rD = fmla(rD, rD, rD) (64-bit)
+#
+:fmla edregA, edregB, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & edregB & imm1619=7
+{
+    edregA = edregA f+ (edregB f* edregC);
+}
+
+#
+# rD = fmls(rD, rD, rD) (64-bit)
+#
+:fmls edregA, edregB, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & edregB & imm1619=8
+{
+    edregA = edregA f- (edregB f* edregC);
+}
+
+#
+# Double conversions
+#
+:ftoi edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=0 & imm1619=0xf
+{
+    edregA = round(edregC);
+}
+
+:ftoi edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=1 & imm1619=0xf
+{
+    edregA = trunc(edregC);
+}
+
+:ftoi edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=2 & imm1619=0xf
+{
+    edregA = ceil(edregC);
+}
+
+:ftoi edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=3 & imm1619=0xf
+{
+    edregA = floor(edregC);
+}
+
+:ftou edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=4 & imm1619=0xf
+{
+    edregA = round(edregC);
+}
+
+:ftou edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=5 & imm1619=0xf
+{
+    edregA = trunc(edregC);
+}
+
+:ftou edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=6 & imm1619=0xf
+{
+    edregA = ceil(edregC);
+}
+
+:ftou edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=7 & imm1619=0xf
+{
+    edregA = floor(edregC);
+}
+
+:itof edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=8 & imm1619=0xf
+{
+    edregA = int2float(edregC);
+}
+
+:utof edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=9 & imm1619=0xf
+{
+    edregA = int2float(edregC);
+}
+
+# Float to double / double to float
+:ftof eregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; eregA & edregC & imm2023=10 & imm1619=0xf
+{
+    eregA = float2float(edregC);
+}
+
+:ftof edregA, eregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & eregC & imm2023=11 & imm1619=0xf
+{
+    edregA = float2float(eregC);
+}
+
+:ftof edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=12 & imm1619=0xf
+{
+    edregA = round(edregC);
+}
+
+:ftof edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=13 & imm1619=0xf
+{
+    edregA = trunc(edregC);
+}
+
+:ftof edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=14 & imm1619=0xf
+{
+    edregA = ceil(edregC);
+}
+
+:ftof edregA, edregC is group=7 & ins0411=0x53 & ins0003=0xe ; edregA & edregC & imm2023=15 & imm1619=0xf
+{
+    edregA = floor(edregC);
+}

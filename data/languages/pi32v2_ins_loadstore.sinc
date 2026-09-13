@@ -92,7 +92,7 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 # Write a series of registers starting at [reg]
 # sw {reg, reg, ...}, [reg]
 #
-:sw {ReadRegs}, [regA] is group=7 & ins0411=0xB0 & regA ; ReadRegs
+:lw {ReadRegs}, [regA] is group=7 & ins0411=0xB0 & regA ; ReadRegs
 {
     mult_addr = regA;
     build ReadRegs;
@@ -278,6 +278,44 @@ ReadRegs: ReadRegsMap is ReadRegsMap [bitset=0; counter=0; sep=0;] {}
 {
     eregA = eregA + eregB;
     *:4 eregA = eregC;
+}
+
+#
+# rB_rA = d[rC+rD]
+#
+:ldw edregA, [eregB + eregC] is group=7 & ins0011=0xc58 ; edregA & eregB & eregC & imm1619=2
+{
+    local addr:4 = eregB + eregC;
+    edregA = *:8 addr;
+}
+
+#
+# d[rC+rD] = rB_rA
+#
+:sdw edregA, [eregB + eregC] is group=7 & ins0011=0xc58 ; edregA & eregB & eregC & imm1619=3
+{
+    local addr:4 = eregB + eregC;
+    *:8 addr = edregA;
+}
+
+#
+# rB_rA = d[rC++=imm]
+#
+:ldw edregA, [eregB++=imm8] is group=7 & ins0011=0xc58 ; edregA & eregB & imm2427 & imm1819 & imm1617=0
+[ imm8 = (imm2427 << 4) | (imm1819 << 2); ]
+{
+    edregA = *:8 eregB;
+    eregB = eregB + imm8;
+}
+
+#
+# d[rC++=imm] = rB_rA
+#
+:sdw edregA, [eregB++=imm8] is group=7 & ins0011=0xc58 ; edregA & eregB & imm2427 & imm1819 & imm1617=1
+[ imm8 = (imm2427 << 4) | (imm1819 << 2); ]
+{
+    *:8 eregB = edregA;
+    eregB = eregB + imm8;
 }
 
 #

@@ -410,6 +410,36 @@
 }
 
 #
+# rA = sat8(rB) (u, 32-bit register)
+#
+:sat8.u eregA, eregC is group=7 & ins0011=0x07c ; eregA & eregC & imm1623=0
+{
+    local src:4 = eregC;
+    if (src > 0xff) goto <clamp>;
+    eregA = src;
+    goto inst_next;
+<clamp>
+    eregA = 0xff;
+}
+
+#
+# rA = sat8(rB) (s, 32-bit register)
+#
+:sat8.s eregA, eregC is group=7 & ins0011=0x07c ; eregA & eregC & imm1623=1
+{
+    local src:4 = eregC;
+    if (src s> 0x7f) goto <clamp_hi>;
+    if (src s< -0x80) goto <clamp_lo>;
+    eregA = src;
+    goto inst_next;
+<clamp_hi>
+    eregA = 0x7f;
+    goto inst_next;
+<clamp_lo>
+    eregA = -0x80;
+}
+
+#
 # rA = sat16(rB) (u)
 #
 :sat16.u eregA, eregC is group=7 & ins0011=0x078 ; eregA & eregC & imm1623=0
@@ -486,4 +516,49 @@
     goto inst_next;
 <skip>
     eregA = eregB;
+}
+
+###########################################################################################
+# Memory Arithmetic with packed immediate
+###########################################################################################
+
+#
+# [rA+offset] += packedimm12
+#
+:add [eregA+#offset], #packedimm12 is group=7 & ins0611=0x2E & imm0005s ; eregA & packedimm12
+[ offset = imm0005s<<2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr + packedimm12;
+}
+
+###########################################################################################
+# Reversal & DSP Arithmetic
+###########################################################################################
+
+#
+# rA = rev16(rC)  (reverse 16-bit halfwords)
+#
+:rev16 eregA, eregC is group=7 & ins0011=0x070 ; eregA & eregC & imm1623=0x40
+{
+    eregA = (eregC << 16) | (eregC >> 16);
+}
+
+#
+# rA = revs(rC.l)  (byte-swap low halfword and sign-extend)
+#
+:revs16 eregA, eregC is group=7 & ins0011=0x070 ; eregA & eregC & imm1623=0x80
+{
+    local b0:4 = eregC & 0xff;
+    local b1:4 = (eregC >> 8) & 0xff;
+    local swapped:4 = (b0 << 8) | b1;
+    eregA = sext(swapped[0,16]);
+}
+
+#
+# rA += rC (brev)  (bit-reversed carry add)
+#
+:addrev eregA, eregC is group=7 & ins0011=0x0b0 ; eregA & eregC & imm1623=0
+{
+    eregA = BitReverseAdd(eregA, eregC);
 }

@@ -95,6 +95,10 @@ define token instr(16)
 	ins0606 = (6,6)
 	ins0707 = (7,7)
 	imm0505 = (5,5)
+	ins0505 = (5,5)
+	ins0202 = (2,2)
+	ins0101 = (1,1)
+	ins0000 = (0,0)
 
 	ins0004 = (0,4)
 	ins0304 = (3,4)
@@ -190,6 +194,8 @@ define token instr2(16)
 	imm1631 = (0,15)
     imm1631s = (0,15) signed
     imm1717 = (1,1)
+    imm1818 = (2,2)
+    imm1919 = (3,3)
     imm1719 = (1,3)
     imm1727 = (1,11)
     imm1827 = (2,11)
@@ -199,11 +205,14 @@ define token instr2(16)
     imm1823 = (2,7)
     imm1823s = (2,7) signed
     imm2023 = (4,7)
+    imm2020 = (4,4)
+    imm2223 = (6,7)
     imm2325 = (7, 9)
     imm2327 = (7,11)
     imm2425 = (8, 9)
     imm2627 = (10,11)
     imm2427 = (8,11)
+    imm2227 = (6,11)
 
     imm1731 = (1,15)
     imm1831 = (2,15)
@@ -230,6 +239,8 @@ define token instr2(16)
 	eregC = (8,11)
     esregC = (8, 11)
 	eregB = (4,7)
+    eregD = (0,3)
+    eregD2 = (0,3)
 
     edregA = (13,15)
     edregC = (9,11)
@@ -265,7 +276,7 @@ attach variables [ sregA esregC ]
 attach variables [ dregA dregB edregA edregB edregC ]
 	[ r0_r1 r2_r3 r4_r5 r6_r7 r8_r9 r10_r11 r12_r13 r14_r15 ];
 
-attach variables [ eregA eregB eregC]
+attach variables [ eregA eregB eregC eregD eregD2 ]
 	[ r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15 ];
 
 attach variables [ regCxle ]
@@ -406,6 +417,14 @@ jaddr23: res is imm0005s ; imm1631
 # 32-bit jump immediate (pc-relative)
 #
 jaddr32: res is imm1631 ; imm3247s
+    [ res = ((imm3247s << 16) | imm1631) + inst_next; ]
+    { export *:4 res;}
+
+jaddr32_call: res is imm1616=0 & imm1631 ; imm3247s
+    [ res = ((imm3247s << 16) | imm1631) + inst_next; ]
+    { export *:4 res;}
+
+jaddr32_gotoss: res is imm1616=1 & imm1631 ; imm3247s
     [ res = ((imm3247s << 16) | imm1631) + inst_next; ]
     { export *:4 res;}
 
@@ -615,6 +634,24 @@ define pcodeop TODO;
 define pcodeop FloatCompare;
 define pcodeop FloatMin;
 define pcodeop FloatMax;
+define pcodeop BitReverseAdd;
+define pcodeop CoprocessorExecute;
+define pcodeop ShiftAndRound;
+define pcodeop CircularShift;
+define pcodeop SIMD_Align;
+define pcodeop SIMD_Pack;
+define pcodeop SIMD_PackB;
+define pcodeop SIMD_Unpack;
+define pcodeop SIMD_VSat;
+define pcodeop SIMD_Mts;
+define pcodeop SIMD_Add;
+define pcodeop SIMD_Sub;
+define pcodeop SIMD_Mul;
+define pcodeop SIMD_Mac;
+define pcodeop SIMD_Shift;
+define pcodeop SIMD_MinMax;
+define pcodeop SIMD_Compare;
+define pcodeop SIMD_Op;
 
 # Categorized
 @include "pi32v2_ins_progflow.sinc"
@@ -622,6 +659,8 @@ define pcodeop FloatMax;
 @include "pi32v2_ins_move.sinc"
 @include "pi32v2_ins_arithops.sinc"
 @include "pi32v2_ins_para_arithops.sinc"
+@include "pi32v2_ins_mac.sinc"
+@include "pi32v2_ins_simd.sinc"
 @include "pi32v2_ins_logicops.sinc"
 @include "pi32v2_ins_shiftrot.sinc"
 @include "pi32v2_ins_bitops.sinc"
@@ -629,6 +668,7 @@ define pcodeop FloatMax;
 @include "pi32v2_ins_loadstore.sinc"
 @include "pi32v2_ins_ifthenelse.sinc"
 @include "pi32v2_ins_float.sinc"
+@include "pi32v2_ins_extra.sinc"
 
 ##########################################################################################
 # Uncategorized #

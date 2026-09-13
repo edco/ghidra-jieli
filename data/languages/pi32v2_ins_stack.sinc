@@ -510,6 +510,70 @@ pshsregset16: "{psr, sr4, rets, retx, rete, reti}" is imm0005=63 { pushreg(psr);
     sp = mult_addr;
 }
 
+###########################################################################################
+# Load/Store Multiple to General Pointer Registers
+###########################################################################################
+
+#
+# {regs...} = [rA++] (LMIA)
+#
+:lmia regA, {popmap} is group=7 & ins0411=0xb1 & regA ; popmap
+{
+    mult_addr = regA;
+    build popmap;
+    regA = mult_addr;
+}
+
+#
+# [rA++] = {regs...} (SMIA)
+#
+:smia regA, {pshmap} is group=7 & ins0411=0xb3 & regA ; pshmap
+{
+    mult_addr = regA;
+    build pshmap;
+    regA = mult_addr;
+}
+
+#
+# {regs...} = [-rA] (LMD)
+#
+:lmd regA, {popmap} is group=7 & ins0411=0xb4 & regA ; popmap
+{
+    mult_addr = regA;
+    build popmap;
+    regA = mult_addr;
+}
+
+#
+# {regs...} = [--rA] (LMDB)
+#
+:lmdb regA, {popmap} is group=7 & ins0411=0xb5 & regA ; popmap
+{
+    mult_addr = regA;
+    build popmap;
+    regA = mult_addr;
+}
+
+#
+# [-rA] = {regs...} (SMD)
+#
+:smd regA, {pshmap} is group=7 & ins0411=0xb6 & regA ; pshmap
+{
+    mult_addr = regA;
+    build pshmap;
+    regA = mult_addr;
+}
+
+#
+# [--rA] = {regs...} (SMDB)
+#
+:smdb regA, {pshmap} is group=7 & ins0411=0xb7 & regA ; pshmap
+{
+    mult_addr = regA;
+    build pshmap;
+    regA = mult_addr;
+}
+
 #
 # [sp] = rA
 # => sw rA, [sp]
