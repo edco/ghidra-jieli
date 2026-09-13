@@ -18,10 +18,10 @@
             variant="default"
             version="1.0"
             slafile="pi32v2.sla"
-            processorspec="pi32.pspec"
+            processorspec="pi32v2.pspec"
             id="pi32v2:LE:32:default">
     <description>JieLi's pi32v2 architecture</description>
-    <compiler name="default" spec="pi32.cspec" id="default" />
+    <compiler name="default" spec="pi32v2.cspec" id="default" />
   </language>
 
   <language processor="JieLi q32s"
