@@ -79,5 +79,17 @@ To recompile the SLEIGH specification binary (`pi32v2.sla`):
 <GHIDRA_INSTALL_DIR>/support/sleigh data/languages/pi32v2.slaspec data/languages/pi32v2.sla
 ```
 
+## Rebuilding Peripheral Data Type Archive (.gdt)
+
+If `data/headers/ac7911b8_peripherals.h` is modified, rebuild `data/typeinfo/ac7911b8_peripherals.gdt` via Ghidra Headless:
+```bash
+<GHIDRA_INSTALL_DIR>/support/analyzeHeadless /tmp/tmp_gdt TempProj \
+  -import <any_sample.elf> -processor pi32v2:LE:32:ac7911b8 \
+  -scriptPath ghidra_scripts -postScript BuildPeripheralsGDT.java \
+  -deleteProject -noanalysis
+```
+*(Alternatively, run `BuildPeripheralsGDT.java` from the Ghidra Script Manager, or use GUI **File -> Parse C Source...**)*
+
 ## License
 Apache License 2.0. See [LICENSE](LICENSE) for details.
+
