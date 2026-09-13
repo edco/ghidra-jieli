@@ -370,7 +370,7 @@
 #
 # rA = abs(rB)
 #
-:abs eregA, eregC is group=7 & ins0011=0x430 ; eregA & eregC & imm1623=0
+:abs eregA, eregC is group=7 & ins0011=0x430 ; eregA & eregC
 {
     if (eregC s>=0) goto <skip>;
     eregA = (eregC ^ 0xffffffff) + 1;

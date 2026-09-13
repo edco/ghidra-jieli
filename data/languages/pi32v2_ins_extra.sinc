@@ -3,7 +3,7 @@
 #############################################################################
 
 # COPEXw_ddi: edregA = copex(edregC) (imm)
-:copex edregA, edregC, imm1623 is group=7 & ins0011=0x1ff ; edregA & imm2828=0 & edregC & imm2023=0 & imm1623
+:copex edregA, edregC, imm1623 is group=7 & ins0011=0x1ff ; edregA & imm2828=0 & edregC & imm1623
 {
     local imm:4 = imm1623;
     edregA = CoprocessorExecute(edregC, imm);
