@@ -83,7 +83,7 @@ To recompile the SLEIGH specification binary (`pi32v2.sla`):
 
 Because `.gdt` is Ghidra's serialized data type database format, Ghidra's C parser library is used to generate it from the C header.
 
-To rebuild `data/typeinfo/ac7911b8_peripherals.gdt` without launching the GUI or dummy headless projects:
+To rebuild `data/typeinfo/ac7911b8_peripherals.gdt`:
 ```bash
 ./tools/build_gdt.sh
 ```
