@@ -237,6 +237,8 @@
 shamt4_32: "32" is imm2427=0 { local c:4 = 32; export c; }
 shamt4_32: imm2427 is imm2427 { local c:4 = imm2427; export c; }
 
+shamt16_31: imm is imm2427 [ imm = 16 | imm2427; ] { local c:4 = imm; export c; }
+
 #
 # [rA+offset] <<= shamt
 #
@@ -245,6 +247,13 @@ shamt4_32: imm2427 is imm2427 { local c:4 = imm2427; export c; }
 {
     addr:4 = eregA + offset;
     *:4 addr = *:4 addr << shamt4_32;
+}
+
+:lsl [eregA+offset], shamt16_31 is group=7 & ins0011=0x86d ; eregA & shamt16_31 & imm1823s & imm1617=0
+[ offset = imm1823s << 2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr << shamt16_31;
 }
 
 #
@@ -257,6 +266,13 @@ shamt4_32: imm2427 is imm2427 { local c:4 = imm2427; export c; }
     *:4 addr = *:4 addr << shamt4_32;
 }
 
+:qasl [eregA+offset], shamt16_31 is group=7 & ins0011=0x86d ; eregA & shamt16_31 & imm1823s & imm1617=1
+[ offset = imm1823s << 2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr << shamt16_31;
+}
+
 #
 # [rA+offset] >>= shamt
 #
@@ -267,6 +283,13 @@ shamt4_32: imm2427 is imm2427 { local c:4 = imm2427; export c; }
     *:4 addr = *:4 addr >> shamt4_32;
 }
 
+:lsr [eregA+offset], shamt16_31 is group=7 & ins0011=0x86d ; eregA & shamt16_31 & imm1823s & imm1617=2
+[ offset = imm1823s << 2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr >> shamt16_31;
+}
+
 #
 # [rA+offset] >>>= shamt
 #
@@ -275,6 +298,13 @@ shamt4_32: imm2427 is imm2427 { local c:4 = imm2427; export c; }
 {
     addr:4 = eregA + offset;
     *:4 addr = *:4 addr s>> shamt4_32;
+}
+
+:qasr [eregA+offset], shamt16_31 is group=7 & ins0011=0x86d ; eregA & shamt16_31 & imm1823s & imm1617=3
+[ offset = imm1823s << 2; ]
+{
+    addr:4 = eregA + offset;
+    *:4 addr = *:4 addr s>> shamt16_31;
 }
 
 ###########################################################################################

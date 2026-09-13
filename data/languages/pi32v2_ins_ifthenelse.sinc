@@ -90,7 +90,7 @@
 #
 # ifs (rA <= #packedimm12) { ... } else { ... }
 #
-:ifs (regA <= #packedimm12) { is group=7 & ins0411=0xEB & regA ; packedimm12 & ifcnt & elsecnt
+:ifs (regA <= #packedimm12) { is group=7 & ins0411=0xEA & regA ; packedimm12 & ifcnt & elsecnt
 [
     # Save instructions count for then and else branches
     thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
@@ -100,6 +100,69 @@
 ]
 {
     if (regA s> packedimm12) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+#
+# ifs (rA <= #imm1627s) { ... } else { ... }
+#
+:ifs (regA <= #imm1627s) { is group=7 & ins0411=0xEB & regA ; imm1627s & ifcnt & elsecnt
+[
+    # Save instructions count for then and else branches
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA s> imm1627s) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+#
+# ifs (rA > #packedimm12) { ... } else { ... }
+#
+:ifs (regA > #packedimm12) { is group=7 & ins0411=0xE2 & regA ; packedimm12 & ifcnt & elsecnt
+[
+    # Save instructions count for then and else branches
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA s<= packedimm12) goto <else>;
+    cres=1;
+    goto <end>;
+
+<else>
+    cres=0;
+<end>
+}
+
+#
+# ifs (rA > #imm1627s) { ... } else { ... }
+#
+:ifs (regA > #imm1627s) { is group=7 & ins0411=0xE3 & regA ; imm1627s & ifcnt & elsecnt
+[
+    # Save instructions count for then and else branches
+    thenbranch=ifcnt+1; globalset(inst_next, thenbranch);
+    elsebranch=elsecnt; globalset(inst_next, elsebranch);
+
+    ifblock=1; globalset(inst_next, ifblock);
+]
+{
+    if (regA s<= imm1627s) goto <else>;
     cres=1;
     goto <end>;
 
