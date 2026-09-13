@@ -87,7 +87,7 @@ To rebuild `data/typeinfo/ac7911b8_peripherals.gdt` without launching the GUI or
 ```bash
 ./tools/build_gdt.sh
 ```
-*(Alternatively, in the Ghidra GUI: open **File -> Parse C Source...**, add `ac7911b8_peripherals.h`, and parse into an archive, or run `BuildPeripheralsGDT.java` from the Script Manager).*
+*(Alternatively, in the Ghidra GUI: open **File -> Parse C Source...**, add `ac7911b8_peripherals.h`, and parse into an archive).*
 
 ## License
 Apache License 2.0. See [LICENSE](LICENSE) for details.
