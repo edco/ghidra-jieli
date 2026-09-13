@@ -138,7 +138,19 @@ public class SetupJieLiProgram extends GhidraScript {
 
         // 4. Apply variant peripheral structures dynamically if GDT archive exists
         if (variant != null && !variant.isEmpty() && !variant.equalsIgnoreCase("default")) {
-            File gdtFile = new File("ghidra-jieli/data/typeinfo/" + variant + "_peripherals.gdt");
+            File scriptFile = getSourceFile() != null ? getSourceFile().getFile(false) : null;
+            File gdtFile = null;
+            if (scriptFile != null) {
+                File moduleDir = scriptFile.getParentFile().getParentFile();
+                gdtFile = new File(moduleDir, "data/typeinfo/" + variant + "_peripherals.gdt");
+            }
+            if (gdtFile == null || !gdtFile.exists()) {
+                gdtFile = new File("ghidra-jieli/data/typeinfo/" + variant + "_peripherals.gdt");
+            }
+            if (!gdtFile.exists()) {
+                gdtFile = new File("data/typeinfo/" + variant + "_peripherals.gdt");
+            }
+
             String scriptName = "Apply" + variant.toUpperCase() + "Peripherals.java";
             if (gdtFile.exists()) {
                 println("Found peripheral GDT archive for " + variant + ", running " + scriptName + "...");

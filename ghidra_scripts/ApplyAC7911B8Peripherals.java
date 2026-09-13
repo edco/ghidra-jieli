@@ -109,11 +109,32 @@ public class ApplyAC7911B8Peripherals extends GhidraScript {
         new PeriphDef("JL_EQ_RAM", "JL_EQ_RAM_TypeDef", 0x0001e800L),
         new PeriphDef("JL_ANC", "JL_ANC_TypeDef", 0x0001f000L),
         new PeriphDef("JL_ANC_RAM", "JL_ANC_RAM_TypeDef", 0x0001f800L),
+
+        // Core Special Function Registers (CSFR: 0x01ee0000)
+        new PeriphDef("JL_CMNG", "JL_CMNG_TypeDef", 0x01ee0000L),
+        new PeriphDef("JL_SDTAP", "JL_SDTAP_TypeDef", 0x01ee0100L),
+        new PeriphDef("JL_MBIS", "JL_MBIS_TypeDef", 0x01ee0200L),
+        new PeriphDef("JL_HMEM", "JL_HMEM_TypeDef", 0x01ee0300L),
+        new PeriphDef("JL_FFT", "JL_FFT_TypeDef", 0x01ee0400L),
+        new PeriphDef("JL_COREX2", "JL_TypeDef_corex2", 0x01eee000L),
+        new PeriphDef("JL_Q32DSP0", "JL_TypeDef_q32DSP", 0x01eef000L),
+        new PeriphDef("JL_Q32DSP1", "JL_TypeDef_q32DSP", 0x01eef200L),
     };
 
     @Override
     public void run() throws Exception {
-        File gdtFile = new File("ghidra-jieli/data/typeinfo/ac7911b8_peripherals.gdt");
+        File scriptFile = getSourceFile() != null ? getSourceFile().getFile(false) : null;
+        File gdtFile = null;
+        if (scriptFile != null) {
+            File moduleDir = scriptFile.getParentFile().getParentFile();
+            gdtFile = new File(moduleDir, "data/typeinfo/ac7911b8_peripherals.gdt");
+        }
+        if (gdtFile == null || !gdtFile.exists()) {
+            gdtFile = new File("ghidra-jieli/data/typeinfo/ac7911b8_peripherals.gdt");
+        }
+        if (!gdtFile.exists()) {
+            gdtFile = new File("data/typeinfo/ac7911b8_peripherals.gdt");
+        }
         if (!gdtFile.exists()) {
             printerr("GDT file not found: " + gdtFile.getAbsolutePath());
             return;
