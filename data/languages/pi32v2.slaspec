@@ -23,6 +23,12 @@ define register offset=0x100 size=4
 	  sr8  sr9  sr10 icfg usp ssp sp pc
     ];
 
+#
+# Banked stack pointer registers (privilege-level switching)
+#
+define register offset=0x140 size=4
+    [ uspn sspn ];
+
 define register offset=0x0160 size=4
     [
         mult_addr 	  # Special internal register for dealing with multiple stores/loads
@@ -625,6 +631,10 @@ define pcodeop InstructionCacheFlush;
 define pcodeop DataCacheFlush;
 define pcodeop DataCacheLineInvalidate;
 define pcodeop Trigger;
+define pcodeop SendEventGlobal;
+define pcodeop WaitForEvent;
+define pcodeop ReturnToSupervisor;
+define pcodeop ReturnToNormal;
 
 define pcodeop IfElseBlock;
 define pcodeop RepeatBlock;
@@ -760,6 +770,22 @@ define pcodeop SIMD_Op;
 #
 :sevl is group=0 & ins0012=0x0042
 {
+}
+
+#
+# sevg - Send Event Global (multi-core event signaling)
+#
+:sevg is group=0 & ins0012=0x0043
+{
+	SendEventGlobal();
+}
+
+#
+# wfe - Wait For Event
+#
+:wfe is group=0 & ins0012=0x0044
+{
+	WaitForEvent();
 }
 
 #

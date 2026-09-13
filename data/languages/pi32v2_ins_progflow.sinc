@@ -51,6 +51,24 @@
 }
 
 #
+# rtss - Return To Supervisor State
+#
+:rtss is group=0 & ins0012=0x0084
+{
+	ReturnToSupervisor();
+	return [rets];
+}
+
+#
+# rtns - Return To Normal State (user mode)
+#
+:rtns is group=0 & ins0012=0x0085
+{
+	ReturnToNormal();
+	return [rets];
+}
+
+#
 # trigger
 #
 :trigger is group=7 & ins0012=0x0870 ; imm1631=0
